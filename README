@@ -1,10 +1,16 @@
 Installation:
 
-1) Install the Google Chrome extension: Download and open the file topcoditor.crx using Google Chrome or drag and drop it into a Google Chrome window.
+1) To install the Google Chrome extension, download and open the file topcoditor.crx using Google Chrome or drag and drop it into a Google Chrome window.
 
 2) Download template.cpp and systemplate.cpp to convenient locations.
 
 3) In Google Chrome, go to Wrench Icon -> Tools -> Extensions -> Topcoditor Options. There you must enter the directory you want Topcoditor to save files in, and the locations of the Solution Template (that would be the path you saved template.cpp to) and the System Tests Template (likewise for systemplate.cpp).
+
+Usage: 
+Open a Topcoder problem statement.
+Notice two icons, one of a lightbulb and the other of a checkmark.
+The lightbulb button saves ProblemName.cpp, the skeleton solution to your working directory.
+The checkmark button saves ProblemNameSystemTests.hpp, the header file containing system test data to your working directory.
 
 Customization:
 
@@ -32,3 +38,5 @@ The test cases are separated by sep.
 
 The system-tests tag has the exact same syntax as example-tests.
 
+Bugs:
+Please report bugs and help make this project better.
