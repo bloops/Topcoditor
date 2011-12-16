@@ -1,0 +1,70 @@
+<html>
+<head><title>Topcoditor Options</title></head>
+<script type="text/javascript">
+
+function closeStatus(){
+    document.getElementById("status").style.display=" none";
+}
+
+// Saves options to localStorage.
+function save_options() {
+    var save_dir = document.getElementById("save_directory").value;
+  localStorage["save_directory"] = save_dir;
+
+  var solution_template = document.getElementById("solution_template").value;
+  localStorage["solution_template"] = solution_template;
+
+  var systests_template = document.getElementById("systests_template").value;
+  localStorage["systests_template"] = systests_template;
+
+  var modify_title = document.getElementById("modify_title");
+  localStorage["modify_title"] = modify_title.checked;
+
+    var status = document.getElementById("status");    
+    status.innerHTML = "Saved!";
+    window.setTimeout("closeStatus();", 5000);
+
+    
+}
+
+// Restores select box state to saved value from localStorage.
+function restore_options() {
+    var save_dir = localStorage["save_directory"];
+    document.getElementById("save_directory").value = save_dir;
+
+    var solution_template = localStorage["solution_template"];
+    document.getElementById("solution_template").value = solution_template;
+
+    var systests_template = localStorage["systests_template"];
+    document.getElementById("systests_template").value = systests_template;
+
+    console.log(localStorage["modify_title"]);
+    document.getElementById("modify_title").checked = ("true"==localStorage["modify_title"]);
+}
+
+</script>
+
+<body onload="restore_options()">
+
+Folder to Save Stuff in:
+<input id="save_directory" type="text" name="location" size="30">
+<br/>
+
+Solution Template:
+<input id="solution_template" type="text" name="sol_template" size="30">
+<br/>
+
+System Tests Template:
+<input id="systests_template" type="text" name="sys_template" size="30">
+<br/>
+
+Modify Page Title:
+<input id="modify_title" type="checkbox">
+
+<br>
+<button onclick="save_options()">Save</button>
+
+<p id="status"></p>
+
+</body>
+</html>

@@ -1,0 +1,232 @@
+<html>
+  <head>
+    <title>TopcodeIT</title>
+    <script>
+
+var plugin = document.createElement("embed");
+plugin.setAttribute("type", "application/x-npapi-file-io");
+document.documentElement.appendChild(plugin);
+
+// replace $i in string by arr[i]
+replacePlaceholders = function(string, arr){
+    //console.log("Calling replacePlaceholders with " + string + " and " + arr);
+    for (i in arr){
+        string = string.replace("$"+i.toString(),arr[i]);
+    }
+    //console.log("Returning " + string);
+    return string;
+}
+
+array2DToString = function(pattern, separator, arr){
+    //console.log("arrayToString with " + pattern + " " + separator + " " + arr);
+    var strings = new Array();
+    for (var i = 0; i < arr.length; i++) {
+        strings.push(replacePlaceholders(pattern, arr[i]));
+    }
+    ret = strings.join(separator);
+    //console.log(ret);
+    return strings.join(separator);
+}
+
+arrayToString = function(pattern, separator, arr){
+    //console.log("arrayToString with " + pattern + " " + separator + " " + arr);
+    var strings = new Array();
+    for (var i = 0; i < arr.length; i++) {
+        strings.push(pattern.replace("$0", arr[i]));
+    }
+    ret = strings.join(separator);
+    //console.log(ret);
+    return strings.join(separator);
+}
+
+// wont work for nested arrays
+splitParams = function(s){
+    var res = new Array();
+    var inside = false;
+    var accum = "";
+    for (var i = 0; i < s.length; i++){
+        if(s[i] == ',' && !inside){
+            res.push(accum)
+            accum = "";
+            continue;
+        }
+        if(s[i] == '{')
+            inside = true;
+        if(s[i] == '}')
+            inside = false;
+        accum += s[i];
+    }
+    res.push(accum);
+    return res;
+}
+
+cppType = function(type) {
+    if(type.indexOf('[]') >= 0){
+        var str = 'vector<' + cppType(type.replace(/\[\]/,''))  +'>';
+        while(str.indexOf('>>') >= 0)
+            str = str.replace(/>>/,'> >');
+        return str;
+    }
+    switch(type){
+        case "String": return "string";
+        case "long" : return "long long";
+        default: return type;
+    }
+}
+
+writeSystemTests = function(classname, systemTests){
+    var filename = classname + "SystemTests.hpp";
+    var path_prefix = localStorage["save_directory"];
+    var path = path_prefix + filename;
+    if(plugin.fileExists(path)){
+        //plugin.removeFile(path);
+        return ('"'+filename+'"' + ' already exists. Not overwriting.');
+    }
+    var templatefile = localStorage["systests_template"];
+    if(!plugin.fileExists(templatefile)){
+        return ('Fatal Error: "' + templatefile + '" missing.');
+    }
+    
+    var template = plugin.getTextFile(templatefile);
+    var tags = template.match(/<%[\s\S]*?%>/gi);
+    //console.log(template);
+    //console.log(tags);
+    for (var i = 0; i < tags.length; i++){
+        var tag = tags[i].slice(2,-2);
+        var args = tag.split(':');
+        switch(args[0]){
+            case "system-tests":
+            var params_patt = args[1];
+            var params_sep = args[2];
+            var params_ex_sep = args[3];
+            var ex_patt = args[4];
+            var sep = args[5];
+            var testcases = new Array();
+            for (var j = 0; j < systemTests.length; j++) {
+                params = splitParams(systemTests[j][0]);
+                expected = systemTests[j][1];
+                //console.log("Params " + params);
+                //console.log("Expected " + expected);
+                t = arrayToString(params_patt,params_sep, params);
+                t += params_ex_sep;
+                t += ex_patt.replace("$0",expected);
+                testcases.push(t);
+            }
+            testcases_string = testcases.join(sep);
+            template = template.replace(tags[i],testcases_string);
+            break;
+        }
+    }
+
+    plugin.saveTextFile(path,template);
+    return 'File written to "' + path + '" using template "' + templatefile + '" successfully.';
+
+}
+
+
+writeSolution = function(classname, method, returnType, parameters, exampleTests){
+
+    returnType = cppType(returnType);
+
+    for (var i = 0; i < parameters.length; i++)
+        parameters[i][0] = cppType(parameters[i][0]);
+
+
+    var filename = classname + ".cpp";
+    var path_prefix = localStorage["save_directory"];
+    var path = path_prefix + filename;
+
+    if(plugin.fileExists(path)){
+        //plugin.removeFile(path);
+        return (filename + ' already exists. Not overwriting.');
+    }
+
+    var templatefile = localStorage["solution_template"];
+
+    if(!plugin.fileExists(templatefile)){
+        return ('Fatal Error: "' + templatefile + '" missing.');
+    }
+    
+    var template = plugin.getTextFile(templatefile);
+    var tags = template.match(/<%[\s\S]*?%>/gi);
+
+    for (var i = 0; i < tags.length; i++){
+        var tag = tags[i].slice(2,-2);
+        //console.log(tag);
+        var args = tag.split(':');
+        switch(args[0]){
+            case "class-name":
+            template = template.replace(tags[i],classname);
+            break;
+            case "return-type":
+            template = template.replace(tags[i],returnType);
+            break;
+            case "method-name":
+            template = template.replace(tags[i],method);
+            break;
+
+            case "parameters":
+            var patt = args[1];
+            var sep = args[2];
+            var pstring = array2DToString(patt,sep,parameters);
+            template = template.replace(tags[i],pstring);
+            break;
+
+            case "example-tests":
+
+            var params_patt = args[1];
+            var params_sep = args[2];
+            var params_ex_sep = args[3];
+            var ex_patt = args[4];
+            var sep = args[5];
+
+            var examples = new Array();
+            for (var j = 0; j < exampleTests.length; j++) {
+                params = exampleTests[j][0];
+                // console.log(params);
+                // console.log(params[0]);
+                // console.log(params[1]);
+                ex = arrayToString(params_patt,params_sep, params);
+                ex += params_ex_sep;
+                ex += ex_patt.replace("$0",exampleTests[j][1]);
+                examples.push(ex);
+            }
+            examples_string = examples.join(sep);
+            template = template.replace(tags[i],examples_string);
+            break;
+        }
+    }
+
+    plugin.saveTextFile(path,template);
+    return 'File written to "' + path + '" using template "' + templatefile + '" successfully.';
+}
+
+
+chrome.extension.onRequest.addListener(
+  function(request, sender, sendResponse) {
+    console.log(sender.tab ?
+                "from a content script:" + sender.tab.url :
+                "from the extension");
+
+      if(request.request == "systemTests"){
+          var status = writeSystemTests(request.classname, request.systemTests);
+          sendResponse({status: status});
+      }
+      else if(request.request == "solution"){
+          var status = writeSolution(request.classname, request.method, request.returnType, 
+                      request.parameters, request.exampleTests);
+          sendResponse({status: status});
+      }
+      else if(request.request == "setTitle"){
+          sendResponse({allowed: localStorage["modify_title"]});
+      }
+
+
+  });
+
+          
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
