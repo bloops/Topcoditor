@@ -1,4 +1,4 @@
-Installation:
+* Installation:
 
 1) To install the Google Chrome extension, download and open the file topcoditor.crx using Google Chrome or drag and drop it into a Google Chrome window.
 
@@ -6,25 +6,26 @@ Installation:
 
 3) In Google Chrome, go to Wrench Icon -> Tools -> Extensions -> Topcoditor Options. There you must enter the directory you want Topcoditor to save files in, and the locations of the Solution Template (that would be the path you saved template.cpp to) and the System Tests Template (likewise for systemplate.cpp).
 
-Usage: 
+* Usage: 
+
 Open a Topcoder problem statement.
 Notice two icons, one of a lightbulb and the other of a checkmark.
 The lightbulb button saves ProblemName.cpp, the skeleton solution to your working directory.
 The checkmark button saves ProblemNameSystemTests.hpp, the header file containing system test data to your working directory.
 
-Customization:
+* Customization:
 
 You can edit the sample template file to create your own customized templates. The template file uses some tags to denote problem specific data such as class-name, method-name etc. Wherever these tags are found, they are replaced with the problem specific appropriate value. Most of the tags should be pretty self-explanatory. Some of them are: <%class-name%>, <%return-type%>, <%method-name%>.
 
 The parameters tag is a bit more involved. The general form is <%parameter:pattern:separator%> where pattern and separator are user-defined strings. This says that, the parameters would be listed (in the order given in the problem statement), separated by the string 'separator'. Each parameter has the form of pattern, where every occurrence of $0 in it is replaced by the parameter type, and $1 is replaced by the parameter identifier.
 
-For example: <%parameters:$0 $1:, %> would output a string like "type1 param1, type2 param2, type3 param3". 
+For example: <%parameters:$0 $1:, %> would output "type1 param1, type2 param2, type3 param3". 
 
-And the tag:
+And the tag
 <%parameters:$0 $1:;
 %>;
 
-would output the parameters like:
+would output the parameters in the form
 type1 param1;
 type2 param2;
 type3 param3;
@@ -38,5 +39,5 @@ The test cases are separated by sep.
 
 The system-tests tag has the exact same syntax as example-tests.
 
-Bugs:
+* Bugs:
 Please report bugs and help make this project better.
