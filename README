@@ -9,9 +9,14 @@
 * Usage: 
 
 Open a Topcoder problem statement.
+
 Notice two icons, one of a lightbulb and the other of a checkmark.
 The lightbulb button saves ProblemName.cpp, the skeleton solution to your working directory.
 The checkmark button saves ProblemNameSystemTests.hpp, the header file containing system test data to your working directory.
+
+Compilation must be done with g++ 4.5 or later, with the flag "-std=c++0x".
+
+Change the line "#define SYSTEM_TEST 0" to "#define SYSTEM_TEST 1" to run system tests on your solution. You must have ProblemNameSystemTests.hpp saved in the same directory.
 
 * Customization:
 
